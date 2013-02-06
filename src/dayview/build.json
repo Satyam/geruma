@@ -1,0 +1,10 @@
+{
+    "name": "dayview",
+    "builds": {
+        "dayview": {
+            "jsfiles": [
+                "js/dayview.js"
+            ]
+        }
+    }
+}

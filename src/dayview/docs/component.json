@@ -1,0 +1,11 @@
+{
+    "name"       : "dayview",
+    "displayName": "Gallery: dayview",
+    "description": "*Summary Goes Here*",
+    "author"     : [ "Satyam" ],
+    "use"        : [ "dayview" ],
+
+    "tags": [ "gallery" ],
+
+    "examples": []
+}

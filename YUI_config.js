@@ -1,0 +1,21 @@
+YUI_config={
+    "groups":{
+        "src":{
+            "base":"build/",
+            "modules":{
+                "zeView":{
+                    "requires":["base"],
+                    "path":"zeView/zeView-min.js"
+                },
+                "contentSwapper":{
+                    "requires":["zeView"],
+                    "path":"contentSwapper/contentSwapper-min.js"
+                },
+                "dayview":{
+                    "requires":["gallery-md-accordion","resize-plugin","transition","zeView"],
+                    "path":"dayview/dayview-min.js"
+                }
+            }
+        }
+}
+}

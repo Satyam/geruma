@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+        <script type="text/javascript" src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script>
+        <script type="text/javascript" src="YUI_config.js"></script>
+        <!--link href="tabcontent.css" rel="stylesheet" type="text/css"/-->
+    </head>
+    <body class="yui3-skin-sam">
+        <div id="container"></div>
+        <script>
+            YUI({
+                filter:'raw',
+                combine:false,
+                gallery:'gallery-2013.01.30-21-00'
+            }).use('router', function (Y) {
+                var router = new Y.Router({
+                    // root:'/apps',
+                    routes: [
+                        {
+                            path: '/dayview',
+                            callbacks: function () {
+                                Y.use('dayview',function (){
+                                    new Y.DayView().render('#container');
+
+                                });
+                            }
+                        }
+                    ]
+                });
+                router.dispatch();
+            });
+
+        </script>
+    </body>
+</html>
