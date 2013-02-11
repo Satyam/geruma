@@ -1,17 +1,170 @@
 #!/usr/bin/env nodejs
+"use strict";
 var express = require('express'),
-    mysql      = require('mysql').createConnection({
-        host     : 'localhost',
-        user     : 'root',
-        password : '',
-        database : 'geruma'
-    }),
-    app = express();
+mysql      = require('mysql').createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'geruma'
+}),
+app = express(),
+path = require('path');
 
 app.use(express.bodyParser());
+require('yui').YUI().use('array-extras','parallel', function(Y) {
+    var yeach = Y.Array.each;
 
-require('yui').YUI().use('array-extras', function(Y) {
+    var pases = function (id, callback) {
+        mysql.query('Select * From Pases Where IdAsiento=?', id, function (err, rows) {
+            if (err) throw err;
+            var datos = {};
+            yeach(rows, function (row) {
+                datos[row.IdPase] = {
+                    cuenta: row.Cuenta,
+                    importe: row.Debe === null ? row.Haber : -row.Debe
+                };
+            });
+            callback(datos);
+        });
 
+    };
+
+    var anexos = function (id, callback) {
+        mysql.query(
+            'Select * From Anexos  Where IdAsiento=?', id,
+            function (err, rows) {
+                var data = {};
+                if (err) throw err;
+                yeach(rows, function(anexo) {
+                    var d = {};
+                    switch(anexo.Tipo) {
+                        case 1:
+                            d.iva = {
+                                baseImponible:anexo.Importe,
+                                porcentaje: parseFloat(anexo.Texto) || 0
+                            };
+                            break;
+                        case 2:
+                            d.numCheque = anexo.Texto;
+                            break;
+                        case 3:
+                            d.conciliacion = anexo.Numero;
+                            break;
+                        case 4:
+                            d.fecha = anexo.Fecha;
+                            break;
+                        case 5:
+                            d.clientes = anexo.Numero;
+                            break;
+                        case 6:
+                            d.conciliado = anexo.Numero;
+                            break;
+                        case 7:
+                            d.efvoCierre = anexo.Importe;
+                            break;
+                        case 8:
+                            d.cierraApertura = anexo.Numero;
+                            break;
+                        case 9:
+                            d.cerradaEn = anexo.Numero;
+                            break;
+                        case 10:
+                            d.diferencia = anexo.Importe;
+                            break;
+                        case 11:
+                            d.diferenciaAsiento = {
+                                importe: anexo.Importe,
+                                asiento: anexo.Numero
+                            };
+                            break;
+                        case 12:
+                            d.diferenciaCierre = {
+                                importe: anexo.Importe,
+                                fecha: anexo.Fecha
+                            };
+                            break;
+                        case 13:
+                            d.diferenciaApertura = anexo.Numero;
+                            break;
+                        case 14:
+                            d.pendienteConciliar = true;
+                            break;
+                        case 15:
+                            d.pendienteCerrar = true;
+                            break;
+                        case 16:
+                            d.debitoBancarioPendienteConciliar = true;
+                            break;
+                        case 17:
+                            d.transferencia = true;
+                            break;
+                        case 18:
+                            d.cargosYComisiones = true;
+                            break;
+                        case 19:
+                            d.domiciliacion = true;
+                            break;
+                        case 20:
+                            d.provedor = anexo.Texto;
+                            break;
+                        case 21:
+                            d.tarjeta = true;
+                            break;
+                        case 22:
+                            d.efvoApertura = anexo.Importe;
+                            break;
+                        case 23:
+                            d.ajusteAsiento = {
+                                asiento: anexo.Numero,
+                                causa: anexo.Texto
+                            };
+                            break;
+                        case 24:
+                            d.dividendoComoNomina = true;
+                            break;
+                        case 25:
+                            d.verAsiento = anexo.Numero;
+                            break;
+
+                    }
+                    data[anexo.IdAnexo] = d;
+                });
+                callback(data);
+        });
+    };
+
+    var asiento = function (id, callback) {
+        var sync = new Y.Parallel(),
+            dataAsiento, dataPases, dataAnexos;
+
+       mysql.query('Select IdAsiento, Fecha, AutoAsiento, Asientos.Descr, IdUsr, ' +
+            ' Nombre From Asientos inner join Users using(IdUsr) right join ' +
+            ' TiposAutoAsiento on Asientos.AutoAsiento = TiposAutoAsiento.Codigo ' +
+            'where IdAsiento = ?', id, sync.add(function (err, rows) {
+            if (err) throw err;
+            dataAsiento = rows[0];
+        }));
+        pases(id, sync.add(function (data) {
+            dataPases = data;
+        }));
+        anexos(id, sync.add(function (data) {
+            dataAnexos = data;
+        }));
+
+        sync.done(function () {
+            console.log('asiento', dataAsiento);
+            console.log('pases', dataPases);
+            console.log('anexos', dataAnexos);
+            console.log(callback);
+
+            dataAsiento.pases = dataPases;
+            dataAsiento.anexos = dataAnexos;
+            console.log('finalmente', dataAsiento);
+            callback(dataAsiento);
+
+        });
+
+    };
 
     // app.use('/apps', express.static('.'));
     app.get('/', function (req, res) {
@@ -19,85 +172,48 @@ require('yui').YUI().use('array-extras', function(Y) {
         res.sendfile('index.html');
     });
 
-    app.get('/qq', function (req, res) {
-       mysql.query('SELECT * from Cuentas order by Grupo, Codigo', function(err, rows) {
-           if (err) throw err;
-           var thSent = false;
-           res.send('<table>' + Y.Array.map(rows, function(row) {
-               var cells = [];
-               if (!thSent) {
-                   thSent = true;
-                   Y.Object.each(row, function (value, name) {
-                       cells.push('<th>' + name + '</th>');
-                   });
-                   cells.push('</tr><tr>');
-               }
-               Y.Object.each(row, function (value, name) {
-                   cells.push('<td>' + value + '</td>');
-               });
-               return '<tr>' + cells.join('\n') + '</tr>';
-           }).join('\n') + '</table>');
-       });
-    });
+
     app.get('/dayview', function(req, res){
         console.log('asked for dayview, sending index.html');
         res.sendfile('index.html');
     });
 
-    app.get('/pies/:pieId', function (req, res) {
-       res.send(bakery[req.params.pieId]);
+    app.get('/data/apertura/:fecha', function (req, res) {
+        var fecha = req.params.fecha;
+        console.log('lee apertura for:', fecha);
+        mysql.query('Select Asientos.IdAsiento, Nombre, Asientos.IdUsr from Asientos ' +
+            ' inner join Users on Asientos.IdUsr = Users.IdUsr' +
+            ' where AutoAsiento = 4 and Asientos.Fecha = ?' +
+            ' group by Asientos.IdAsiento', fecha, function(err, rows) {
+            if (err) throw err;
+            if (!rows.length) {
+                res.send(404);
+            }
+            var reply  = rows[0];
+            anexos(reply.IdAsiento,  function (data) {
+               res.send(Y.merge(reply, data));
+            });
+        });
     });
 
-    app.get('/pies', function (req, res) {
-        console.log('Listing all stock in the bakery');
-        var a = [];
-        for (var i in bakery) {
-            a.push(bakery[i]);
-        }
-        res.send(a);
+    app.get('/data/asiento/:id', function (req, res) {
+        var id = parseInt(req.params.id,10);
+        console.log('lectura asiento', id);
+
+        asiento(id, function(data) {
+            res.send(data);
+        });
     });
 
-    app.post('/pies', function (req, res) {
-         var body = req.body;
-         console.log('Adding ' , body.type);
-         console.log(body);
-         lastId += 1;
-         body.pieId = lastId;
-         bakery[lastId] = body;
-         res.status(201);
-         res.send({pieId:  lastId});
+    // These should always go last:
+    app.get('/jivaprototype/*' , function (req, res) {
+        console.log('/jivaprototype:', path.resolve('..' + req.path));
+        res.sendfile(path.resolve('..' + req.path));
     });
-
-
-    app['delete']('/pies/:pieId', function (req, res) {
-        var pieId = req.params.pieId;
-        console.log('deleting', pieId);
-        delete bakery[pieId];
-        res.send(200);
-
+    app.get('/myGallery/*' , function (req, res) {
+        console.log('/myGallery:', path.resolve('..' + req.path));
+        res.sendfile(path.resolve('..' + req.path));
     });
-
-    app.put('/pies/:pieId', function (req, res) {
-         var pieId = req.params.pieId;
-         console.log('Modifying ' , pieId);
-         console.log(req.body);
-         bakery[pieId] = req.body;
-         res.send(200);
-    });
-
-    app.get('/pieView', function (req, res) {
-        console.log('requested /pieView, sending index.html');
-        res.sendfile('index.html');
-    })
-    app.get('/pieTable', function (req, res) {
-        console.log('requested /pieTable, sending index.html');
-        res.sendfile('index.html');
-    })
-    app.get('/all', function (req, res) {
-        console.log('requested /pieTable, sending index.html');
-        res.sendfile('index.html');
-    })
-
     app.get('*', function (req, res) {
         console.log('*', req.path);
         res.sendfile('.' + req.path);

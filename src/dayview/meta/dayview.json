@@ -1,7 +1,7 @@
 {
     "dayview": {
         "requires": [
-            "gallery-md-accordion","resize-plugin", "transition","zeView"
+            "gallery-md-accordion","resize-plugin", "transition","zeView", "apertura", "base-build"
         ]
     }
 }

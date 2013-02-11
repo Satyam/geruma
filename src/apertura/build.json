@@ -1,0 +1,11 @@
+{
+    "name": "apertura",
+    "builds": {
+        "apertura": {
+            "jsfiles": [
+                "js/aperturaV.js",
+                "js/aperturaM.js"
+            ]
+        }
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "popup-asiento": {
+        "requires": [
+            "yui-base"
+        ]
+    }
+}

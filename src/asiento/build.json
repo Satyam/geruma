@@ -1,0 +1,13 @@
+{
+    "name": "asiento",
+    "builds": {
+        "asiento": {
+            "jsfiles": [
+
+                "js/asientoM.js",
+                "js/asientoV.js",
+                "js/asiento.js"
+            ]
+        }
+    }
+}

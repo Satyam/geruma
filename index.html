@@ -22,7 +22,8 @@
                             path: '/dayview',
                             callbacks: function () {
                                 Y.use('dayview',function (){
-                                    new Y.DayView().render('#container');
+                                    var dv = new Y.DayView().render('#container');
+                                    console.log(dv.getBody(0).getHTML());
 
                                 });
                             }

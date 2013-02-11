@@ -1,0 +1,10 @@
+{
+    "name": "popup-asiento",
+    "builds": {
+        "popup-asiento": {
+            "jsfiles": [
+                "js/popup-asiento.js"
+            ]
+        }
+    }
+}

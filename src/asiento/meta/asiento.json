@@ -1,0 +1,7 @@
+{
+    "asiento": {
+        "requires": [
+            "yui-base"
+        ]
+    }
+}

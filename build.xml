@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="test" default="build" basedir="./">
+	<target name="build">
+		<apply executable="shifter" force="true" addsourcefile="false" dir="src">
+            <fileset dir="./" includes="YUI_config.js"/>
+            <arg value="--walk" />
+            <arg value="--no-quiet"/>
+		</apply>
+	</target>
+	<target name="yuiconfig">
+		<apply executable="makeYUIconfig" force="true" addsourcefile="false">
+            <fileset dir="./" includes="YUI_config.js"/>
+            <arg value="./src"/>
+            <arg value="../jivaprototype/src" />
+            <arg value="../myGallery/src"/>
+		</apply>
+	</target>
+</project>
