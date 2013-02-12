@@ -191,7 +191,11 @@ require('yui').YUI().use('array-extras','parallel', function(Y) {
             }
             var reply  = rows[0];
             anexos(reply.IdAsiento,  function (data) {
-               res.send(Y.merge(reply, data));
+                Y.Object.each(data, function (value) {
+                    reply.efvoApertura = reply.efvoApertura || value.efvoApertura;
+                    reply.cerradaEn = reply.cerradaEn || value.cerradaEn;
+                })
+               res.send(reply);
             });
         });
     });

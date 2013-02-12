@@ -1,0 +1,7 @@
+{
+    "tabs": {
+        "requires": [
+            "yui-base","tabview"
+        ]
+    }
+}

@@ -1,2 +1,8 @@
 /nbproject/
 
+/node_modules/grunt/node_modules/.bin/
+/node_modules/grunt-contrib-jshint/node_modules/.bin/
+/node_modules/grunt-contrib-nodeunit/node_modules/nodeunit/node_modules/tap/node_modules/.bin/
+/node_modules/grunt-contrib-nodeunit/node_modules/.bin/
+/node_modules/grunt-contrib-nodeunit/node_modules/nodeunit/node_modules/.bin/
+/node_modules/grunt-contrib-nodeunit/node_modules/nodeunit/node_modules/tap/node_modules/runforcover/node_modules/bunker/node_modules/burrito/node_modules/.bin/

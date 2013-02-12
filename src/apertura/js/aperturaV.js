@@ -16,10 +16,12 @@ Y.AperturaView = Y.Base.create(NAME + '-view',
         },
         onAsientoClick: function (ev) {
             console.log('asiento click', ev.currentTarget.getHTML());
-            new Y.PopupAsiento(parseInt(ev.currentTarget.getHTML(),10))
+            Y.router.save('/newTab/asiento/' + parseInt(ev.currentTarget.getHTML(),10));
+            // new Y.PopupAsiento({id:parseInt(ev.currentTarget.getHTML(),10)}).render();
         },
         onCerradoClick: function (ev) {
-            new Y.PopupAsiento(parseInt(ev.currentTarget.getHTML(),10))
+            console.log('asiento cierre click', ev.currentTarget.getHTML());
+            new Y.PopupAsiento({id:parseInt(ev.currentTarget.getHTML(),10)}).render();
         }
     }
 );

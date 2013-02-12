@@ -1,7 +1,7 @@
 {
     "popup-asiento": {
         "requires": [
-            "yui-base"
+            "yui-base", "asiento", "zeView"
         ]
     }
 }

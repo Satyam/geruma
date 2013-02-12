@@ -1,7 +1,7 @@
 {
     "asiento": {
         "requires": [
-            "yui-base"
+            "yui-base","zeView","model","model-sync-rest"
         ]
     }
 }

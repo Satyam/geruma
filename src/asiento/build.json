@@ -5,8 +5,7 @@
             "jsfiles": [
 
                 "js/asientoM.js",
-                "js/asientoV.js",
-                "js/asiento.js"
+                "js/asientoV.js"
             ]
         }
     }

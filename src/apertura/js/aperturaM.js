@@ -4,7 +4,7 @@ Y.AperturaModel = Y.Base.create(NAME + '-model',
     {
         idAttribute: 'fecha',
         getURL: function (action, options) {
-            return '/data/apertura/' + Y.Date.format(options.fecha, {format: '%Y%m%d'})
+            return '/data/apertura/' + Y.Date.format(options.fecha, {format: '%Y%m%d'});
         }
     }
 );

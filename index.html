@@ -14,23 +14,55 @@
                 filter:'raw',
                 combine:false,
                 gallery:'gallery-2013.01.30-21-00'
-            }).use('router', function (Y) {
-                var router = new Y.Router({
-                    // root:'/apps',
+            }).use('router', 'tabs', function (Y) {
+                var tabView = new Y.Tabs().render('#container');
+
+                var router = Y.router = new Y.Router({
                     routes: [
                         {
                             path: '/dayview',
                             callbacks: function () {
                                 Y.use('dayview',function (){
-                                    var dv = new Y.DayView().render('#container');
-                                    console.log(dv.getBody(0).getHTML());
-
+                                    if (!tabView.hasURL(req.path)) {
+                                        tabView.setLabel('Sumario del día');
+                                        tabView.setURL = req.path;
+                                        tabView.addDestroyable(new Y.DayView().render(tabView.getPanel()));
+                                    }
                                 });
+                            }
+                        },
+                        {
+                            path: '/newTab/*route',
+                            callbacks: function (req) {
+                                var route = req.params.route;
+                                tabView.newPanel();
+                                router.save('/' + route);
+
+                            }
+                        },
+                        {
+                            path:'/asiento/:id',
+                            callbacks: function (req) {
+                                var id = parseInt(req.params.id, 10) || 0;
+                                Y.use('asiento',function (){
+                                    tabView.setLabel('Asiento: ' + id);
+                                    var model = new Y.AsientoModel({id: id}),
+                                        view = new Y.AsientoView({model:model});
+                                    model.load(function (err) {
+                                        if (err) throw err;
+                                        view.render(tabView.getPanel());
+                                    });
+                                });
+
                             }
                         }
                     ]
                 });
                 router.dispatch();
+
+                tabView.after('selectionChange', function (ev) {
+                    console.log(ev);
+                });
             });
 
         </script>

@@ -1,7 +1,7 @@
 {
     "apertura": {
         "requires": [
-            "yui-base", "zeView", "model", "model-sync-rest", "base-build", "datatype-date-format"
+            "yui-base", "zeView", "model", "model-sync-rest", "base-build", "datatype-date-format", "popup-asiento"
         ],
         "skinnable": true
     }
