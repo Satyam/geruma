@@ -2,6 +2,7 @@
 <html>
     <head>
         <title></title>
+        <base href="/" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <script type="text/javascript" src="http://yui.yahooapis.com/3.8.0/build/yui/yui.js"></script>
         <script type="text/javascript" src="YUI_config.js"></script>
@@ -21,11 +22,12 @@
                     routes: [
                         {
                             path: '/dayview',
-                            callbacks: function () {
+                            callbacks: function (req) {
                                 Y.use('dayview',function (){
                                     if (!tabView.hasURL(req.path)) {
+                                        tabView.destroyContent();
                                         tabView.setLabel('Sumario del día');
-                                        tabView.setURL = req.path;
+                                        tabView.setURL(req.path);
                                         tabView.addDestroyable(new Y.DayView().render(tabView.getPanel()));
                                     }
                                 });
@@ -36,7 +38,7 @@
                             callbacks: function (req) {
                                 var route = req.params.route;
                                 tabView.newPanel();
-                                router.save('/' + route);
+                                router.replace('/' + route);
 
                             }
                         },
@@ -44,14 +46,19 @@
                             path:'/asiento/:id',
                             callbacks: function (req) {
                                 var id = parseInt(req.params.id, 10) || 0;
-                                Y.use('asiento',function (){
-                                    tabView.setLabel('Asiento: ' + id);
-                                    var model = new Y.AsientoModel({id: id}),
-                                        view = new Y.AsientoView({model:model});
-                                    model.load(function (err) {
-                                        if (err) throw err;
-                                        view.render(tabView.getPanel());
-                                    });
+                                Y.use('asiento',function () {
+                                    if (!tabView.hasURL(req.path)) {
+                                        tabView.destroyContent();
+                                        tabView.setLabel('Asiento: ' + id);
+                                        tabView.setURL(req.path);
+                                        var model = new Y.AsientoModel({id: id}),
+                                            view = new Y.AsientoView({model:model});
+                                        tabView.addDestroyable(model, view);
+                                        model.load(function (err) {
+                                            if (err) throw err;
+                                            view.render(tabView.getPanel());
+                                        });
+                                    }
                                 });
 
                             }
@@ -61,8 +68,12 @@
                 router.dispatch();
 
                 tabView.after('selectionChange', function (ev) {
-                    console.log(ev);
+                    var url = ev.newVal.url;
+                    if (url) {
+                        router.replace(url);
+                    }
                 });
+
             });
 
         </script>

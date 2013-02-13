@@ -137,7 +137,8 @@ require('yui').YUI().use('array-extras','parallel', function(Y) {
         var sync = new Y.Parallel(),
             dataAsiento, dataPases, dataAnexos;
 
-       mysql.query('Select IdAsiento, Fecha, AutoAsiento, Asientos.Descr, IdUsr, ' +
+       mysql.query('Select IdAsiento, Fecha, AutoAsiento, Asientos.Descr, ' +
+            ' TiposAutoAsiento.Descr as aa, IdUsr, ' +
             ' Nombre From Asientos inner join Users using(IdUsr) right join ' +
             ' TiposAutoAsiento on Asientos.AutoAsiento = TiposAutoAsiento.Codigo ' +
             'where IdAsiento = ?', id, sync.add(function (err, rows) {
@@ -152,14 +153,8 @@ require('yui').YUI().use('array-extras','parallel', function(Y) {
         }));
 
         sync.done(function () {
-            console.log('asiento', dataAsiento);
-            console.log('pases', dataPases);
-            console.log('anexos', dataAnexos);
-            console.log(callback);
-
             dataAsiento.pases = dataPases;
             dataAsiento.anexos = dataAnexos;
-            console.log('finalmente', dataAsiento);
             callback(dataAsiento);
 
         });
@@ -175,6 +170,10 @@ require('yui').YUI().use('array-extras','parallel', function(Y) {
 
     app.get('/dayview', function(req, res){
         console.log('asked for dayview, sending index.html');
+        res.sendfile('index.html');
+    });
+    app.get('/asiento/*', function(req, res){
+        console.log('asked for asiento, sending index.html');
         res.sendfile('index.html');
     });
 

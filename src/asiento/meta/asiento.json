@@ -2,6 +2,7 @@
     "asiento": {
         "requires": [
             "yui-base","zeView","model","model-sync-rest"
-        ]
+        ],
+        "skinnable": true
     }
 }

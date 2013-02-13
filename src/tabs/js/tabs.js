@@ -2,23 +2,13 @@ Y.Tabs = Y.Base.create(
     'tabview',
     Y.TabView,
     [],{
-        _dest: null,
         initializer: function () {
             this.newPanel();
             this.after('selectionChange', this._afterSelectionChange);
-            this._dest = [];
-
         },
         getActive: function () {
             return this._selected;
 
-            /*var tab = this.get('selection');
-            if (!tab) {
-                console.log('no current tab');
-                this.selectChild(0);
-                tab = this.get('selection');
-            }
-            return tab;*/
         },
         setLabel: function (label) {
             this._selected.set('label', label);
@@ -29,9 +19,14 @@ Y.Tabs = Y.Base.create(
         newPanel: function () {
             this.add({label: 'new', content:''});
             this.selectChild(this.size() -1);
+
         },
-        addDestroyable: function (obj) {
-            this._destroy.push(obj);
+        addDestroyable: function () {
+            var dl = this._selected._destroyList;
+            if (dl === undefined) {
+                dl = this._selected._destroyList = [];
+            }
+            Array.prototype.push.apply(dl, arguments);
         },
         _afterSelectionChange: function (ev) {
             this._selected = ev.newVal;
@@ -39,22 +34,21 @@ Y.Tabs = Y.Base.create(
         setURL: function (url) {
             this._selected.url = url;
         },
-        hasUrl: function (url) {
-            this.each(function (tab, i) {
+        hasURL: function (url) {
+            return this.some(function (tab, i) {
                 if (tab.url === url) {
                     this.selectChild(i);
                     return true;
                 }
-            });
-            return false;
+            }, this);
         },
         destroyContent: function () {
-            Y.Array.each(this._destroy, function (item) {
+            Y.Array.each(this._selected._destroyList, function (item) {
                 if (item.destroy) {
                     item.destroy();
                 }
             });
-            this._destroy = [];
+            this._selected._destroyList = [];
         }
     }
 );
